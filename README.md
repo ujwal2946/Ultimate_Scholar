@@ -57,3 +57,4 @@ Open: http://127.0.0.1:5000
 ## Deploy later
 Project is structured to be deployable on platforms like Render/Railway by using environment variables and a production-ready WSGI server.
 
+"# Ultimate_Scholar" 
