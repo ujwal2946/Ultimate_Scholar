@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block content %}
+  <div class="page-grid">
+    <div class="card card-glass">
+      <div class="card-body">
+        <h5 class="card-title">Monthly Attendance (Admin)</h5>
+
+        <form method="get" class="mt-3">
+          <div class="row g-3 align-items-end">
+            <div class="col-12 col-md-4">
+              <label class="form-label">Month</label>
+              <input type="month" class="form-control" name="month" value="{{ month }}" required>
+            </div>
+            <div class="col-12 col-md-3">
+              <button class="btn btn-primary w-100" type="submit">Show</button>
+            </div>
+          </div>
+        </form>
+
+        <div class="row g-4 mt-3">
+          <div class="col-12 col-md-4">
+            <div class="glass-stat">Present <div class="stat-value">{{ present_cnt }}</div></div>
+          </div>
+          <div class="col-12 col-md-4">
+            <div class="glass-stat">Absent <div class="stat-value">{{ absent_cnt }}</div></div>
+          </div>
+          <div class="col-12 col-md-4">
+            <div class="glass-stat">Late <div class="stat-value">{{ late_cnt }}</div></div>
+          </div>
+          <div class="col-12">
+            <div class="glass-stat">Attendance Percentage <div class="stat-value">{{ attendance_percentage }}%</div></div>
+          </div>
+        </div>
+
+        <div class="mt-3">
+          <a class="btn btn-glass" href="{{ url_for('bp_attendance_admin.list_attendance') }}">Back to Attendance</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+{% endblock %}
+

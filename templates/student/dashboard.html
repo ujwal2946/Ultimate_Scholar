@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block content %}
+  <div class="page-grid">
+    <div class="card card-glass">
+      <div class="card-body">
+        <h5 class="card-title mb-3">Student Dashboard</h5>
+
+        <div class="row g-4">
+          <div class="col-12 col-lg-6">
+            <div class="glass-stat">
+              Student Profile
+              <div class="mt-2">
+                <div><strong>Name:</strong> {{ student.full_name if student else full_name }}</div>
+                <div><strong>Roll Number:</strong> {{ student.roll_number if student else roll_number }}</div>
+                <div><strong>Username:</strong> {{ student.username if student else username }}</div>
+                {% if student and student.date_of_birth %}
+                  <div><strong>Date of Birth:</strong> {{ student.date_of_birth }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-lg-3">
+            <div class="glass-placeholder">
+              <a class="text-decoration-none" href="{{ url_for('bp_attendance_student.dashboard') }}">
+                Attendance %
+              </a>
+            </div>
+          </div>
+
+          <div class="col-12 col-lg-3">
+            <div class="glass-placeholder">
+              <a class="text-decoration-none" href="{{ url_for('bp_grades_student.dashboard') }}">
+                Grades
+              </a>
+            </div>
+          </div>
+
+          <div class="col-12">
+            <div class="glass-placeholder">Notifications (Coming soon)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+
+

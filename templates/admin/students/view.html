@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block content %}
+  <div class="page-grid">
+    <h2 class="page-title">Student Profile</h2>
+
+    <div class="card card-glass mt-3">
+      <div class="card-body">
+        <div class="row g-4">
+          <div class="col-12 col-lg-8">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+              <div>
+                <h4 class="fw-bold mb-1">{{ student.full_name }}</h4>
+                <div class="text-muted">Student ID: <b>{{ student.id }}</b></div>
+              </div>
+              <div class="d-flex gap-2">
+                <a class="btn btn-glass" href="{{ url_for('bp_student_mgmt.edit_student', student_id=student.id) }}">Edit</a>
+                <a class="btn btn-outline-light" href="{{ url_for('bp_student_mgmt.list_students') }}">Back</a>
+              </div>
+            </div>
+
+            <hr/>
+
+            <h5 class="mb-3">Student Information</h5>
+            <div class="row g-2">
+              <div class="col-12 col-md-6"><div class="text-muted small">Roll Number</div><div>{{ student.roll_number }}</div></div>
+              <div class="col-12 col-md-6"><div class="text-muted small">DOB</div><div>{{ student.date_of_birth }}</div></div>
+              <div class="col-12 col-md-6"><div class="text-muted small">Gender</div><div>{{ student.gender }}</div></div>
+            </div>
+
+            <hr/>
+
+            <h5 class="mb-3">Class Information</h5>
+            <div class="row g-2">
+              <div class="col-12 col-md-6"><div class="text-muted small">Class</div><div>{{ student.class }}</div></div>
+              <div class="col-12 col-md-6"><div class="text-muted small">Section</div><div>{{ student.section }}</div></div>
+              <div class="col-12 col-md-6"><div class="text-muted small">Admission Date</div><div>{{ student.admission_date }}</div></div>
+            </div>
+          </div>
+
+          <div class="col-12 col-lg-4">
+            <div class="glass-placeholder mb-3">Modern Profile Card</div>
+            <h5 class="mb-3">Parent Information</h5>
+            <div class="row g-2">
+              <div class="col-12"><div class="text-muted small">Parent Name</div><div>{{ student.parent_name }}</div></div>
+              <div class="col-12"><div class="text-muted small">Parent Email</div><div>{{ student.parent_email }}</div></div>
+              <div class="col-12"><div class="text-muted small">Parent Phone</div><div>{{ student.parent_phone }}</div></div>
+              <div class="col-12"><div class="text-muted small">Address</div><div style="white-space:pre-wrap;">{{ student.address }}</div></div>
+            </div>
+
+            <div class="mt-3 text-muted small">
+              Created: {{ student.created_at }} <br/>
+              Updated: {{ student.updated_at }}
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+{% endblock %}
+

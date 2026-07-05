@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+      <h2>Analytics</h2>
+      <div class="text-muted">Charts powered by Chart.js</div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <div class="row g-3">
+    <div class="col-md-6">
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <h5 class="card-title">Monthly Attendance ({{ month }})</h5>
+          <canvas id="attendanceMonthly" height="120"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <h5 class="card-title">Grade Distribution</h5>
+          <canvas id="gradeDistribution" height="120"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 mt-2">
+    <div class="col-md-12">
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <h5 class="card-title">Attendance %</h5>
+          <div class="display-6 fw-bold">{{ attendance_percentage }}%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const present = {{ (present_cnt|default(0, true))|int }};
+  const absent = {{ (absent_cnt|default(0, true))|int }};
+  const late = {{ (late_cnt|default(0, true))|int }};
+
+  const labelsMonthly = ['Present','Absent','Late'];
+  const dataMonthly = [present, absent, late];
+
+  if (window.Chart) new Chart(document.getElementById('attendanceMonthly'), {
+    type: 'bar',
+    data: {
+      labels: labelsMonthly,
+      datasets: [{
+        label: 'Count',
+        data: dataMonthly,
+        backgroundColor: ['#198754','#dc3545','#ffc107'],
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
+
+  if (window.Chart) new Chart(document.getElementById('gradeDistribution'), {
+    type: 'doughnut',
+    data: {
+      labels: {{ (grade_labels|default([], true))|tojson }},
+      datasets: [{
+        data: {{ (grade_values|default([], true))|tojson }},
+        backgroundColor: ['#0d6efd','#6610f2','#dc3545','#fd7e14','#198754','#6f42c1'],
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'bottom' }
+      }
+    }
+  });
+</script>
+{% endblock %}
+

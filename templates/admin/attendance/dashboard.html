@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block content %}
+  <div class="page-grid">
+    <div class="row g-4">
+      <div class="col-12 col-md-6 col-xl-3">
+        <div class="glass-stat">Present Today <div class="stat-value">{{ present_today }}</div></div>
+      </div>
+      <div class="col-12 col-md-6 col-xl-3">
+        <div class="glass-stat">Absent Today <div class="stat-value">{{ absent_today }}</div></div>
+      </div>
+      <div class="col-12 col-md-6 col-xl-3">
+        <div class="glass-stat">Late Today <div class="stat-value">{{ late_today }}</div></div>
+      </div>
+      <div class="col-12 col-md-6 col-xl-3">
+        <div class="glass-stat">Attendance % <div class="stat-value">{{ attendance_percentage }}%</div></div>
+      </div>
+    </div>
+
+    <div class="card card-glass mt-4">
+      <div class="card-body">
+        <h5 class="card-title">Today's Absentees</h5>
+        <div class="table-responsive mt-3">
+          <table class="table table-hover align-middle">
+            <thead>
+              <tr>
+                <th>Roll</th>
+                <th>Student</th>
+                <th>Class</th>
+                <th>Section</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if absentees and absentees|length > 0 %}
+                {% for r in absentees %}
+                  <tr>
+                    <td>{{ r.roll_number if r.roll_number is defined else '' }}</td>
+                    <td>{{ r.full_name }}</td>
+                    <td>{{ r.class }}</td>
+                    <td>{{ r.section }}</td>
+                    <td><span class="badge text-bg-danger">{{ r.status }}</span></td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td colspan="5" class="text-muted">No absentees for today.</td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mt-3 d-flex gap-2">
+          <a class="btn btn-glass" href="{{ url_for('bp_attendance_admin.list_attendance') }}">View Attendance</a>
+          <a class="btn btn-primary" href="{{ url_for('bp_attendance_admin.mark_attendance') }}">Mark Attendance</a>
+          <a class="btn btn-glass" href="{{ url_for('bp_attendance_admin.monthly_attendance') }}">Monthly Attendance</a>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+

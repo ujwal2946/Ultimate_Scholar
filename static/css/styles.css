@@ -1,0 +1,204 @@
+:root{
+  --bg0:#f6f8ff;
+  --bg1:#e9efff;
+  --card: rgba(255,255,255,0.78);
+  --card2: rgba(255,255,255,0.92);
+  --border: rgba(30,41,59,0.13);
+  --text:#172033;
+  --muted:#64748b;
+  --primary:#7c5cff;
+  --primary2:#22d3ee;
+}
+
+[data-bs-theme="dark"]{
+  --bg0:#070b14;
+  --bg1:#0b1220;
+  --card: rgba(255,255,255,0.06);
+  --card2: rgba(255,255,255,0.10);
+  --border: rgba(255,255,255,0.16);
+  --text:#e7eefc;
+  --muted: rgba(231,238,252,0.72);
+}
+
+body{
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  color: var(--text);
+  background: radial-gradient(1200px 600px at 15% 0%, rgba(124,92,255,0.25), transparent 60%),
+              radial-gradient(900px 500px at 85% 10%, rgba(34,211,238,0.18), transparent 55%),
+              linear-gradient(180deg, var(--bg0), var(--bg1));
+  min-height: 100vh;
+}
+
+.card-glass, .glass-stat, .glass-placeholder, .role-card-inner, .auth-body .card-glass {
+  background: linear-gradient(135deg, rgba(255,255,255,0.14), rgba(255,255,255,0.06));
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+}
+
+.btn-glass{
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: var(--text);
+  backdrop-filter: blur(10px);
+}
+
+.btn-glass:hover{ transform: translateY(-1px); }
+
+/* Welcome / roles */
+.welcome-body{ overflow-x:hidden; }
+.bg-orb{
+  position: absolute;
+  width: 520px;
+  height: 520px;
+  border-radius: 50%;
+  filter: blur(28px);
+  opacity: 0.8;
+  pointer-events: none;
+}
+.orb-1{ top: -160px; left: -160px; background: rgba(124,92,255,0.35); }
+.orb-2{ top: -120px; right: -180px; background: rgba(34,211,238,0.25); }
+
+.welcome-card{
+  position: relative;
+  margin: 90px auto 0;
+  padding: 28px;
+  max-width: 720px;
+  animation: floatIn 0.8s ease both;
+}
+
+@keyframes floatIn{
+  from{ opacity: 0; transform: translateY(18px) scale(0.98); }
+  to{ opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.logo-circle{
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, var(--primary), rgba(34,211,238,0.95));
+  box-shadow: 0 12px 30px rgba(124,92,255,0.25);
+}
+
+/* Role cards */
+.role-card{
+  text-decoration: none;
+  color: inherit;
+  display:block;
+  transition: transform 240ms ease, box-shadow 240ms ease;
+}
+.role-card-inner{
+  padding: 22px;
+  height: 100%;
+  transition: transform 240ms ease;
+}
+.role-card:hover{ transform: translateY(-6px); }
+.role-card:hover .role-card-inner{ transform: scale(1.01); }
+.role-icon{ color: rgba(255,255,255,0.92); margin-bottom: 10px; }
+.role-title{ font-size: 1.15rem; font-weight: 800; margin-bottom: 6px; }
+.role-desc{ color: var(--muted); font-size: 0.95rem; }
+
+/* Shell layout */
+.app-shell{ display:flex; min-height: 100vh; }
+.sidebar{
+  width: 270px;
+  padding: 22px 18px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  background: color-mix(in srgb, var(--card2) 75%, transparent);
+  border-right: 1px solid var(--border);
+  z-index: 1040;
+  overflow-y: auto;
+}
+
+
+.sidebar-brand{
+  display:flex; gap:12px; align-items:center;
+  margin-bottom: 22px;
+}
+.brand-title{ font-weight: 900; letter-spacing: 0.2px; }
+.brand-subtitle{ font-size: 0.85rem; color: var(--muted); }
+
+.sidebar-nav{ display:flex; flex-direction:column; gap: 6px; }
+.sidebar-link{
+  color: var(--muted);
+  text-decoration:none;
+  padding: 12px 12px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  transition: background 200ms ease, border-color 200ms ease, transform 200ms ease;
+}
+.sidebar-link:hover{
+  color: var(--text);
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.12);
+  transform: translateY(-1px);
+}
+.sidebar-link.active{ color:#fff; background:linear-gradient(135deg,var(--primary),#5b8cff); }
+
+.main-content{ flex:1; padding: 16px 22px 60px; }
+.topbar{
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom: 18px;
+}
+.topbar-left,.topbar-right{ display:flex; align-items:center; gap:12px; min-width:0; }
+.topbar-right form{ margin:0; }
+.content-wrap{ max-width:1440px; margin:0 auto; }
+.form-label{ font-weight:650; margin-bottom:.4rem; }
+.form-control,.form-select{ min-height:44px; }
+.card{ color:var(--text); background:var(--card2); border-color:var(--border)!important; }
+.table{ --bs-table-color:var(--text); --bs-table-bg:transparent; --bs-table-hover-color:var(--text); }
+.text-muted{ color:var(--muted)!important; }
+.page-title{ font-size: 1.2rem; font-weight: 900; margin:0; }
+.icon-btn{
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.14);
+  color: var(--text);
+  width: 42px; height: 42px;
+  border-radius: 14px;
+}
+
+.user-pill{
+  display:flex; gap:10px; align-items:center;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 999px;
+}
+.user-dot{ width: 10px; height: 10px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--primary2)); }
+
+.page-grid{ margin-top: 18px; }
+.glass-stat{ padding: 18px; text-align:center; }
+.stat-value{ font-size: 1.6rem; font-weight: 900; margin-top: 8px; }
+.glass-placeholder{ padding: 18px; height: 100%; min-height: 90px; display:flex; align-items:center; justify-content:center; font-weight: 700; color: var(--muted); }
+
+/* Animations */
+.card-glass{ animation: fadeUp 420ms ease both; }
+@keyframes fadeUp{ from{ opacity:0; transform: translateY(8px);} to{opacity:1; transform: translateY(0);} }
+
+@media (max-width: 992px){
+  .sidebar{ display:block; position:fixed; left:0; transform:translateX(-105%); transition:transform .22s ease; background:var(--bg1); box-shadow:0 20px 50px rgba(0,0,0,.35); z-index:1041; }
+  .sidebar.is-open{ transform:translateX(0); }
+  body.sidebar-open{ overflow:hidden; }
+
+
+  .main-content{ padding: 16px 14px 40px; }
+  .app-shell{ display:block; }
+}
+@media (max-width: 600px){
+  .topbar{ align-items:flex-start; gap:10px; }
+  .topbar-right{ gap:6px; }
+  .user-pill{ display:none; }
+  .page-title{ max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+}
+
+/* Auth body */
+.auth-body{ background: radial-gradient(900px 500px at 30% 0%, rgba(124,92,255,0.25), transparent 55%), linear-gradient(180deg, var(--bg0), var(--bg1)); }
+

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+  <div class="page-grid">
+    <div class="row g-4">
+      <div class="col-12 col-md-6 col-xl-4">
+        <div class="glass-stat">Total Students <div class="stat-value">{{ total_students }}</div></div>
+      </div>
+      <div class="col-12 col-md-6 col-xl-4">
+        <div class="glass-stat">Present Today <div class="stat-value">{{ present_today }}</div></div>
+      </div>
+      <div class="col-12 col-md-6 col-xl-4">
+        <div class="glass-stat">Absent Today <div class="stat-value">{{ absent_today }}</div></div>
+      </div>
+      <div class="col-12 col-md-6 col-xl-4">
+        <div class="glass-stat">Attendance Percentage <div class="stat-value">{{ attendance_percentage }}%</div></div>
+      </div>
+      <div class="col-12 col-md-6 col-xl-4">
+        <div class="glass-stat">Grades <div class="stat-value">{{ grades_count }}</div></div>
+      </div>
+    </div>
+
+    <div class="card card-glass mt-4">
+      <div class="card-body">
+        <h5 class="card-title mb-2">Admin Dashboard</h5>
+        
+      </div>
+    </div>
+  </div>
+{% endblock %}
+

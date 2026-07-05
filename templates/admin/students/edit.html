@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block content %}
+  <div class="page-grid">
+    <h2 class="page-title">Edit Student</h2>
+
+    <div class="card card-glass mt-3">
+      <div class="card-body">
+        {% if errors %}
+          <div class="alert alert-danger">
+            <ul class="mb-0">
+              {% for e in errors %}<li>{{ e }}</li>{% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+
+        <form method="post" class="row g-3">
+          <div class="col-12">
+            <div class="text-muted small">Student ID (read-only): <b>{{ student.id }}</b></div>
+          </div>
+
+          <div class="col-12 col-lg-6">
+            <label class="form-label">Roll Number *</label>
+            <input class="form-control" name="roll_number" value="{{ student.roll_number }}" required />
+          </div>
+          <div class="col-12 col-lg-6">
+            <label class="form-label">Full Name *</label>
+            <input class="form-control" name="full_name" value="{{ student.full_name }}" required />
+          </div>
+
+          <div class="col-12 col-lg-4">
+            <label class="form-label">Date of Birth *</label>
+            <input class="form-control" type="date" name="date_of_birth" value="{{ student.date_of_birth }}" required />
+          </div>
+          <div class="col-12 col-lg-4">
+            <label class="form-label">Gender *</label>
+            <select class="form-select" name="gender" required>
+              <option value="Male" {% if student.gender=='Male' %}selected{% endif %}>Male</option>
+              <option value="Female" {% if student.gender=='Female' %}selected{% endif %}>Female</option>
+              <option value="Other" {% if student.gender=='Other' %}selected{% endif %}>Other</option>
+            </select>
+          </div>
+          <div class="col-12 col-lg-4">
+            <label class="form-label">Admission Date *</label>
+            <input class="form-control" type="date" name="admission_date" value="{{ student.admission_date }}" required />
+          </div>
+
+          <div class="col-12 col-lg-6">
+            <label class="form-label">Class *</label>
+            <input class="form-control" name="class" value="{{ student.class }}" required />
+          </div>
+          <div class="col-12 col-lg-6">
+            <label class="form-label">Section *</label>
+            <input class="form-control" name="section" value="{{ student.section }}" required />
+          </div>
+
+          <div class="col-12">
+            <h5 class="mt-2 mb-2">Parent Information</h5>
+          </div>
+
+          <div class="col-12 col-lg-4">
+            <label class="form-label">Parent Name *</label>
+            <input class="form-control" name="parent_name" value="{{ student.parent_name }}" required />
+          </div>
+          <div class="col-12 col-lg-4">
+            <label class="form-label">Parent Email *</label>
+            <input class="form-control" type="email" name="parent_email" value="{{ student.parent_email }}" required />
+          </div>
+          <div class="col-12 col-lg-4">
+            <label class="form-label">Parent Phone *</label>
+            <input class="form-control" name="parent_phone" value="{{ student.parent_phone }}" required />
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Address *</label>
+            <textarea class="form-control" name="address" rows="3" required>{{ student.address }}</textarea>
+          </div>
+
+          <div class="col-12 d-flex gap-2 flex-wrap">
+            <button class="btn btn-primary" type="submit">Save Changes</button>
+            <a class="btn btn-outline-light" href="{{ url_for('bp_student_mgmt.view_student', student_id=student.id) }}">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/student_management.js') }}"></script>
+{% endblock %}
+

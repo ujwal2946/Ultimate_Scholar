@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Access Denied - Student DBMS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet" />
+  </head>
+  <body class="auth-body">
+    <div class="container py-5">
+      <div class="row justify-content-center">
+        <div class="col-12 col-md-7">
+          <div class="card card-glass p-4">
+            <h2 class="fw-bold mb-2">Access Denied</h2>
+            <p class="text-muted mb-4">You do not have permission to view this page.</p>
+            <div class="d-flex gap-2 flex-wrap">
+              <a class="btn btn-primary" href="{{ url_for('bp_main.get_started') }}">Go to Role Selection</a>
+              {% if session.get('user') %}
+                <form action="{{ url_for('bp_logout.logout') }}" method="post">
+                  <button class="btn btn-outline-light" type="submit">Logout</button>
+                </form>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+

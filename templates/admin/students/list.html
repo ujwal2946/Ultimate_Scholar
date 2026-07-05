@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% block content %}
+  <div class="page-grid">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+      <div>
+        <h2 class="page-title mb-0">Student Management</h2>
+        <div class="text-muted small">Total: {{ total_cnt }} student(s)</div>
+      </div>
+      <a class="btn btn-primary" href="{{ url_for('bp_student_mgmt.add_student') }}">
+        + Add Student
+      </a>
+    </div>
+
+    <div class="card card-glass mt-3">
+      <div class="card-body">
+        <form class="row g-2" method="get" action="{{ url_for('bp_student_mgmt.list_students') }}">
+          <div class="col-12 col-lg-4">
+            <label class="form-label">Live Search</label>
+            <input class="form-control" name="q" value="{{ filters.q or '' }}" placeholder="Name, roll number, class, section" />
+          </div>
+          <div class="col-6 col-lg-2">
+            <label class="form-label">Class</label>
+            <select class="form-select" name="class">
+              <option value="" {% if not filters.class %}selected{% endif %}>All</option>
+              {% for c in classes %}
+                <option value="{{ c }}" {% if filters.class==c %}selected{% endif %}>{{ c }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-6 col-lg-2">
+            <label class="form-label">Section</label>
+            <select class="form-select" name="section">
+              <option value="" {% if not filters.section %}selected{% endif %}>All</option>
+              {% for s in sections %}
+                <option value="{{ s }}" {% if filters.section==s %}selected{% endif %}>{{ s }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-12 col-lg-2">
+            <label class="form-label">Gender</label>
+            <select class="form-select" name="gender">
+              <option value="" {% if not filters.gender %}selected{% endif %}>All</option>
+              {% for g in genders %}
+                <option value="{{ g }}" {% if filters.gender==g %}selected{% endif %}>{{ g }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-12 col-lg-2 d-flex align-items-end">
+            <button class="btn btn-glass w-100" type="submit">Search</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="card card-glass mt-3">
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-dark table-hover mb-0">
+            <thead>
+              <tr>
+                <th>Student ID</th>
+                <th>Roll Number</th>
+                <th>Full Name</th>
+                <th>Class</th>
+                <th>Section</th>
+                <th>Parent Name</th>
+                <th>Parent Email</th>
+                <th>Parent Phone</th>
+                <th style="width: 180px;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for s in students %}
+                <tr>
+                  <td>{{ s.id }}</td>
+                  <td>{{ s.roll_number }}</td>
+                  <td>{{ s.full_name }}</td>
+                  <td>{{ s.class }}</td>
+                  <td>{{ s.section }}</td>
+                  <td>{{ s.parent_name }}</td>
+                  <td>{{ s.parent_email }}</td>
+                  <td>{{ s.parent_phone }}</td>
+                  <td>
+                    <div class="d-flex gap-2">
+                      <a class="btn btn-sm btn-outline-light" href="{{ url_for('bp_student_mgmt.view_student', student_id=s.id) }}">View</a>
+                      <a class="btn btn-sm btn-glass" href="{{ url_for('bp_student_mgmt.edit_student', student_id=s.id) }}">Edit</a>
+                      <form method="post" action="{{ url_for('bp_student_mgmt.delete_student', student_id=s.id) }}" class="m-0">
+                        <input type="hidden" name="confirm" value="YES" />
+                        <button type="button" class="btn btn-sm btn-outline-danger student-delete-btn" data-student-name="{{ s.full_name }}">Delete</button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              {% else %}
+                <tr><td colspan="9" class="text-center text-muted py-4">No students found.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <nav class="mt-3" aria-label="Pagination">
+      <ul class="pagination justify-content-center">
+        {% set prev_page = page - 1 %}
+        {% set next_page = page + 1 %}
+        <li class="page-item {% if page<=1 %}disabled{% endif %}">
+          <a class="page-link" href="{{ url_for('bp_student_mgmt.list_students', page=prev_page, **filters) }}">Previous</a>
+        </li>
+        {% for p in range(1, total_pages+1) %}
+          {% if p>=page-2 and p<=page+2 %}
+            <li class="page-item {% if p==page %}active{% endif %}">
+              <a class="page-link" href="{{ url_for('bp_student_mgmt.list_students', page=p, **filters) }}">{{ p }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+        <li class="page-item {% if page>=total_pages %}disabled{% endif %}">
+          <a class="page-link" href="{{ url_for('bp_student_mgmt.list_students', page=next_page, **filters) }}">Next</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/student_management.js') }}"></script>
+{% endblock %}
+

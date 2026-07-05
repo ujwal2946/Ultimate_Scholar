@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% block content %}
+  <div class="page-grid">
+    <h2 class="page-title">Add Student</h2>
+
+    <div class="card card-glass mt-3">
+      <div class="card-body">
+        {% if errors %}
+          <div class="alert alert-danger">
+            <ul class="mb-0">
+              {% for e in errors %}<li>{{ e }}</li>{% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+
+        {% if success %}
+          <div class="alert alert-success">
+            <div class="fw-bold mb-2">{{ success_message }}</div>
+            <div class="mb-1"><span class="text-muted">Generated Username:</span> <b>{{ generated_username }}</b></div>
+            <div class="mb-0"><span class="text-muted">Generated Password:</span> <b>{{ generated_password }}</b></div>
+            <a class="btn btn-primary mt-3" href="{{ url_for('bp_student_mgmt.list_students') }}">Back to List</a>
+          </div>
+          <script>window.__studentMgmtSuccess = true;</script>
+        {% else %}
+          <form method="post" id="studentAddForm" class="row g-3">
+            <div class="col-12">
+              <div class="glass-placeholder">Generated credentials will appear after a successful creation.</div>
+            </div>
+
+            <div class="col-12 col-lg-6">
+              <label class="form-label">Roll Number *</label>
+              <input class="form-control" name="roll_number" value="{{ form.roll_number if form else '' }}" required />
+            </div>
+            <div class="col-12 col-lg-6">
+              <label class="form-label">Full Name *</label>
+              <input class="form-control" name="full_name" value="{{ form.full_name if form else '' }}" required />
+            </div>
+
+            <div class="col-12 col-lg-4">
+              <label class="form-label">Date of Birth *</label>
+              <input class="form-control" type="date" name="date_of_birth" value="{{ form.date_of_birth if form else '' }}" required />
+            </div>
+            <div class="col-12 col-lg-4">
+              <label class="form-label">Gender *</label>
+              <select class="form-select" name="gender" required>
+                <option value="" {% if not form.gender %}selected{% endif %}>Select</option>
+                {% for g in ['Male','Female','Other'] %}
+                  <option value="{{ g }}" {% if form.gender==g %}selected{% endif %}>{{ g }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-12 col-lg-4">
+              <label class="form-label">Admission Date *</label>
+              <input class="form-control" type="date" name="admission_date" value="{{ form.admission_date if form else '' }}" required />
+            </div>
+
+            <div class="col-12 col-lg-6">
+              <label class="form-label">Class *</label>
+              <input class="form-control" name="class" value="{{ form.class if form else '' }}" required />
+            </div>
+            <div class="col-12 col-lg-6">
+              <label class="form-label">Section *</label>
+              <input class="form-control" name="section" value="{{ form.section if form else '' }}" required />
+            </div>
+
+            <div class="col-12">
+              <h5 class="mt-2 mb-2">Parent Information</h5>
+            </div>
+
+            <div class="col-12 col-lg-4">
+              <label class="form-label">Parent Name *</label>
+              <input class="form-control" name="parent_name" value="{{ form.parent_name if form else '' }}" required />
+            </div>
+            <div class="col-12 col-lg-4">
+              <label class="form-label">Parent Email *</label>
+              <input class="form-control" type="email" name="parent_email" value="{{ form.parent_email if form else '' }}" required />
+            </div>
+            <div class="col-12 col-lg-4">
+              <label class="form-label">Parent Phone *</label>
+              <input class="form-control" name="parent_phone" value="{{ form.parent_phone if form else '' }}" required />
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Address *</label>
+              <textarea class="form-control" name="address" rows="3" required>{{ form.address if form else '' }}</textarea>
+            </div>
+
+            <div class="col-12 d-flex gap-2 flex-wrap">
+              <button class="btn btn-primary" type="submit">Create Student</button>
+              <a class="btn btn-outline-light" href="{{ url_for('bp_student_mgmt.list_students') }}">Cancel</a>
+            </div>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/student_management.js') }}"></script>
+{% endblock %}
+

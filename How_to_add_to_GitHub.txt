@@ -1,0 +1,56 @@
+How to add this project to GitHub (step-by-step)
+
+1) Install Git
+- Install Git for Windows from https://git-scm.com/
+- Open Command Prompt and run:
+  git --version
+
+2) Create a GitHub repository
+- Go to https://github.com/
+- Click New repository
+- Name it (example: student-database-management)
+- Choose either:
+  - “Create repository without README” (recommended if you will push your own README.md)
+  - or “Add a README” (if you already have one locally, you may get a merge conflict)
+
+3) Open the project folder in terminal
+- In your project folder (the one containing app.py and README.md), open Command Prompt
+- Make sure you are in the correct folder.
+
+4) Initialize Git (only once)
+  git init
+
+5) Add your files to staging
+  git add .
+
+6) Commit your changes
+  git commit -m "Initial commit"
+
+7) Connect your local repo to GitHub
+- Replace YOUR_USERNAME and YOUR_REPO with your real values.
+
+  git branch -M main
+  git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO.git
+
+8) Push to GitHub
+  git push -u origin main
+
+9) Verify on GitHub
+- Refresh your repository page on GitHub
+- You should see your files uploaded
+
+Common issues
+- Authentication error:
+  - Use GitHub Personal Access Token (PAT) if you see password issues.
+  - Or use “Git Credential Manager” (recommended).
+
+- Branch name mismatch:
+  - If you get an error about master/main, run:
+    git branch -M main
+
+- Large files error:
+  - If you have large binary files, remove them from git and consider Git LFS.
+
+Notes
+- Your .gitignore is already included in the project, so ignored files won’t be pushed.
+- If you need help, tell me your GitHub repo URL and the error message you see, and I can adjust the exact commands.

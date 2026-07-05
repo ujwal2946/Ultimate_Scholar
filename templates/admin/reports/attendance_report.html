@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+      <h2>Attendance Report</h2>
+      <div class="text-muted">Filters are applied server-side.</div>
+    </div>
+  </div>
+
+  <div class="card shadow-sm border-0 mb-3">
+    <div class="card-body">
+      <form method="GET" class="row g-3 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label">Month (YYYY-MM)</label>
+          <input class="form-control" name="month" value="{{ filters.month }}" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Class</label>
+          <input class="form-control" name="class" value="{{ filters.class }}" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Section</label>
+          <input class="form-control" name="section" value="{{ filters.section }}" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Status</label>
+          <select class="form-select" name="status">
+            <option value="" {% if not filters.status %}selected{% endif %}>All</option>
+            {% for s in ['Present','Absent','Late'] %}
+              <option value="{{ s }}" {% if filters.status == s %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-12">
+          <button class="btn btn-primary">Generate Reports</button>
+          <a class="btn btn-outline-secondary ms-2" href="{{ url_for('bp_reports_admin.attendance_report') }}">Reset</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-3">
+    <div class="col-md-3">
+      <div class="stat-box">
+        <div class="stat-label">Present</div>
+        <div class="stat-value">{{ present_cnt }}</div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="stat-box">
+        <div class="stat-label">Absent</div>
+        <div class="stat-value">{{ absent_cnt }}</div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="stat-box">
+        <div class="stat-label">Late</div>
+        <div class="stat-value">{{ late_cnt }}</div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="stat-box">
+        <div class="stat-label">Attendance %</div>
+        <div class="stat-value">{{ attendance_percentage }}%</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card shadow-sm border-0 mb-3">
+    <div class="card-body">
+      <form method="POST" action="{{ url_for('bp_reports_admin.export_attendance_csv') }}">
+        <input type="hidden" name="month" value="{{ filters.month }}" />
+        <input type="hidden" name="class" value="{{ filters.class }}" />
+        <input type="hidden" name="section" value="{{ filters.section }}" />
+        <input type="hidden" name="status" value="{{ filters.status }}" />
+        <button class="btn btn-success">Export CSV</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-striped table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Roll Number</th>
+              <th>Student</th>
+              <th>Class</th>
+              <th>Section</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in rows %}
+              <tr>
+                <td>{{ r.attendance_date }}</td>
+                <td>{{ r.roll_number }}</td>
+                <td>{{ r.full_name }}</td>
+                <td>{{ r.class }}</td>
+                <td>{{ r.section }}</td>
+                <td>
+                  {% if r.status == 'Present' %}
+                    <span class="badge bg-success">Present</span>
+                  {% elif r.status == 'Absent' %}
+                    <span class="badge bg-danger">Absent</span>
+                  {% else %}
+                    <span class="badge bg-warning text-dark">Late</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+            {% if rows|length == 0 %}
+              <tr><td colspan="6" class="text-center text-muted py-4">No records found.</td></tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.stat-box{background:rgba(13,110,253,0.06);border-radius:12px;padding:12px 14px;}
+.stat-label{color:var(--bs-secondary-color);font-size:0.9rem;}
+.stat-value{font-size:1.4rem;font-weight:700;}
+</style>
+{% endblock %}
+

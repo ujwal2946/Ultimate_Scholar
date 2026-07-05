@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block content %}
+  <div class="page-grid">
+    <div class="card card-glass">
+      <div class="card-body">
+        <h5 class="card-title">Mark Attendance (Admin)</h5>
+
+        {% if message %}
+          <div class="alert alert-warning">{{ message }}</div>
+        {% endif %}
+
+        <form method="post" class="mt-3">
+          <div class="row g-3">
+            <div class="col-12 col-md-4">
+              <label class="form-label">Date</label>
+              <input type="date" class="form-control" name="attendance_date" value="{{ today }}" required>
+            </div>
+
+            <div class="col-12 col-md-4">
+              <label class="form-label">Student</label>
+              <select class="form-select" name="student_id" required>
+                <option value="" selected disabled>Select student</option>
+                {% for s in students %}
+                  <option value="{{ s.id }}">{{ s.roll_number }} - {{ s.full_name }} ({{ s.class }} {{ s.section }})</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="col-12 col-md-4">
+              <label class="form-label">Status</label>
+              <select class="form-select" name="status" required>
+                <option value="Present">Present</option>
+                <option value="Absent">Absent</option>
+                <option value="Late">Late</option>
+              </select>
+            </div>
+
+            <div class="col-12 mt-2">
+              <button class="btn btn-primary" type="submit">Save</button>
+              <a class="btn btn-glass ms-2" href="{{ url_for('bp_attendance_admin.list_attendance') }}">Cancel</a>
+            </div>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+{% endblock %}
+

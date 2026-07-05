@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-grid">
+  <div class="row g-4">
+    <div class="col-12 col-md-6 col-xl-3">
+      <div class="glass-stat">Average Marks <div class="stat-value">{{ avg_marks }}</div></div>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3">
+      <div class="glass-stat">Top Performer <div class="stat-value">{{ top_student.full_name if top_student else '-' }}</div></div>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3">
+      <div class="glass-stat">Semester Wise Reports <div class="stat-value">—</div></div>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3">
+      <div class="glass-stat">Grade History <div class="stat-value">—</div></div>
+    </div>
+  </div>
+
+  <div class="card card-glass mt-4">
+    <div class="card-body">
+      <div class="d-flex align-items-center justify-content-between">
+        <h5 class="card-title mb-0">Recent Grade Entries</h5>
+        <a class="btn btn-glass" href="{{ url_for('bp_grades_admin.list_grades') }}">View All</a>
+      </div>
+
+      <div class="table-responsive mt-3">
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Subject</th>
+              <th>Marks</th>
+              <th>Grade</th>
+              <th>Semester</th>
+              <th>Created</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if recent_rows and recent_rows|length > 0 %}
+              {% for r in recent_rows %}
+                <tr>
+                  <td>{{ r.full_name }}</td>
+                  <td>{{ r.subject }}</td>
+                  <td><span class="badge text-bg-primary">{{ r.marks }}</span></td>
+                  <td>{{ r.grade }}</td>
+                  <td>{{ r.semester }}</td>
+                  <td class="text-muted">{{ r.created_at }}</td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="6" class="text-muted">No grade entries yet.</td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
