@@ -28,8 +28,8 @@ CREATE TABLE IF NOT EXISTS students (
   section VARCHAR(50) NOT NULL,
 
   parent_name VARCHAR(200) NOT NULL,
-  parent_email VARCHAR(200) NOT NULL UNIQUE,
-  parent_phone VARCHAR(50) NOT NULL UNIQUE,
+  parent_email VARCHAR(200) NOT NULL,
+  parent_phone VARCHAR(50) NOT NULL,
   address TEXT NOT NULL,
 
   admission_date DATE NOT NULL,
@@ -65,7 +65,6 @@ CREATE TABLE IF NOT EXISTS notifications (
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   CONSTRAINT fk_notifications_student FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
 );
-
 
 
 

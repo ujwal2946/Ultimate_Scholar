@@ -105,27 +105,11 @@ def _validate_student_create(payload: dict) -> tuple[bool, list[str]]:
     if phone and not re.match(r"^[0-9+\-\s]{6,20}$", phone):
         errors.append("Parent phone is not valid.")
 
-    # duplicates (roll_number, parent_email, parent_phone)
+    # Roll numbers are unique; parent contact details may be shared by siblings.
     if payload.get("roll_number"):
         r1 = fetch_one("SELECT id FROM students WHERE roll_number=%s", (payload["roll_number"],))
         if r1:
             errors.append("Roll Number already exists.")
-
-    if payload.get("parent_email"):
-        r2 = fetch_one(
-            "SELECT id FROM students WHERE parent_email=%s",
-            (payload["parent_email"],),
-        )
-        if r2:
-            errors.append("Parent Email already exists.")
-
-    if payload.get("parent_phone"):
-        r3 = fetch_one(
-            "SELECT id FROM students WHERE parent_phone=%s",
-            (payload["parent_phone"],),
-        )
-        if r3:
-            errors.append("Parent Phone already exists.")
 
     return (len(errors) == 0), errors
 
@@ -164,7 +148,7 @@ def _validate_student_update(payload: dict, student_id: int) -> tuple[bool, list
     if phone and not re.match(r"^[0-9+\-\s]{6,20}$", phone):
         errors.append("Parent phone is not valid.")
 
-    # duplicates excluding current student
+    # Roll numbers must be unique; parent contact details may be shared by siblings.
     if payload.get("roll_number"):
         row = fetch_one(
             "SELECT id FROM students WHERE roll_number=%s AND id<>%s",
@@ -172,22 +156,6 @@ def _validate_student_update(payload: dict, student_id: int) -> tuple[bool, list
         )
         if row:
             errors.append("Roll Number already exists.")
-
-    if payload.get("parent_email"):
-        row = fetch_one(
-            "SELECT id FROM students WHERE parent_email=%s AND id<>%s",
-            (payload["parent_email"], student_id),
-        )
-        if row:
-            errors.append("Parent Email already exists.")
-
-    if payload.get("parent_phone"):
-        row = fetch_one(
-            "SELECT id FROM students WHERE parent_phone=%s AND id<>%s",
-            (payload["parent_phone"], student_id),
-        )
-        if row:
-            errors.append("Parent Phone already exists.")
 
     return (len(errors) == 0), errors
 
@@ -522,4 +490,3 @@ def delete_student(student_id: int):
 
     execute("DELETE FROM students WHERE id=%s", (student_id,))
     return redirect(url_for("bp_student_mgmt.list_students"))
-

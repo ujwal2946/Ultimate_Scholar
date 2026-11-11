@@ -1,6 +1,6 @@
 from datetime import date, datetime
 
-from flask import Blueprint, render_template, request, redirect, url_for, session
+from flask import Blueprint, flash, render_template, request, redirect, url_for, session
 
 from utils.auth import login_required, role_required
 from utils.db import execute, fetch_one
@@ -73,12 +73,13 @@ def quick_entry():
                 attendance_id = row["id"] if row else None
 
             if status == "Absent" and attendance_id:
-                record_and_send_absence_notification(
+                sent, notification_message = record_and_send_absence_notification(
                     student_id=student_id,
                     attendance_id=attendance_id,
                     attendance_date=attendance_date,
                     status=status,
                 )
+                flash(notification_message, "success" if sent else "warning")
 
             return redirect(url_for("bp_attendance_attendant.history"))
 
@@ -193,12 +194,13 @@ def update(attendance_id: int):
 
     # Only send email when marked ABSENT.
     if status == "Absent" and attendance:
-        record_and_send_absence_notification(
+        sent, notification_message = record_and_send_absence_notification(
             student_id=attendance["student_id"],
             attendance_id=attendance_id,
             attendance_date=attendance["attendance_date"],
             status=status,
         )
+        flash(notification_message, "success" if sent else "warning")
 
     return redirect(url_for("bp_attendance_attendant.history"))
 

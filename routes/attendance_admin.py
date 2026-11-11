@@ -1,7 +1,7 @@
 from datetime import date, datetime, timedelta
 
 
-from flask import Blueprint, render_template, request, redirect, url_for, session
+from flask import Blueprint, flash, render_template, request, redirect, url_for, session
 
 from utils.auth import login_required, role_required
 from utils.db import execute, fetch_one
@@ -202,71 +202,125 @@ def list_attendance():
 @role_required("admin")
 def mark_attendance():
     message = None
-
-    if request.method == "POST":
-        attendance_date = _parse_date(request.form.get("attendance_date") or "") or _today()
-        student_id = int((request.form.get("student_id") or "0").strip() or 0)
-        status = (request.form.get("status") or "").strip()
-
-        if status not in ("Present", "Absent", "Late"):
-            message = "Invalid status"
-        else:
-            existing = fetch_one(
-                "SELECT id FROM attendance WHERE student_id=%s AND attendance_date=%s",
-                (student_id, attendance_date),
-            )
-
-            if existing:
-                execute(
-                    """
-                    UPDATE attendance
-                    SET status=%s, marked_by=%s, updated_at=NOW()
-                    WHERE id=%s
-                    """,
-                    (status, session.get("user"), existing["id"]),
-                )
-                attendance_id = existing["id"]
-            else:
-                execute(
-                    """
-                    INSERT INTO attendance (student_id, attendance_date, status, marked_by)
-                    VALUES (%s,%s,%s,%s)
-                    """,
-                    (student_id, attendance_date, status, session.get("user")),
-                )
-                row = fetch_one(
-                    "SELECT id FROM attendance WHERE student_id=%s AND attendance_date=%s",
-                    (student_id, attendance_date),
-                )
-                attendance_id = row["id"] if row else None
-
-            # Notify only on ABSENT
-            if status == "Absent" and attendance_id:
-                record_and_send_absence_notification(
-                    student_id=student_id,
-                    attendance_id=attendance_id,
-                    attendance_date=attendance_date,
-                    status=status,
-                )
-
-            return redirect(url_for("bp_attendance_admin.list_attendance"))
-
     from utils.db import get_connection
 
     conn = get_connection()
-    students = []
     try:
         with conn.cursor() as cur:
-            cur.execute(
-                "SELECT id, roll_number, full_name, class, section FROM students ORDER BY full_name ASC"
-            )
-            students = cur.fetchall()
+            cur.execute("SELECT DISTINCT class FROM students ORDER BY class")
+            classes = [row["class"] for row in cur.fetchall()]
     finally:
         conn.close()
+
+    selected_class = (request.values.get("class") or "").strip()
+    attendance_date = _parse_date(request.values.get("attendance_date") or "") or _today()
+    students = []
+
+    if request.method == "POST":
+        if selected_class not in classes:
+            message = "Please select a valid class."
+        else:
+            conn = get_connection()
+            absent_notifications = []
+            try:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        """
+                        SELECT s.id, s.roll_number, s.full_name, s.class, s.section,
+                               s.parent_email, a.id AS attendance_id, a.status AS attendance_status
+                        FROM students s
+                        LEFT JOIN attendance a
+                          ON a.student_id=s.id AND a.attendance_date=%s
+                        WHERE s.class=%s
+                        ORDER BY s.section, s.roll_number, s.full_name
+                        """,
+                        (attendance_date, selected_class),
+                    )
+                    students = cur.fetchall()
+
+                    present_ids = set()
+                    for value in request.form.getlist("present_student_ids"):
+                        try:
+                            present_ids.add(int(value))
+                        except ValueError:
+                            continue
+
+                    for student in students:
+                        status = "Present" if student["id"] in present_ids else "Absent"
+                        previous_status = student["attendance_status"]
+                        if student["attendance_id"]:
+                            cur.execute(
+                                """
+                                UPDATE attendance
+                                SET status=%s, marked_by=%s, updated_at=NOW()
+                                WHERE id=%s
+                                """,
+                                (status, session.get("user"), student["attendance_id"]),
+                            )
+                            attendance_id = student["attendance_id"]
+                        else:
+                            cur.execute(
+                                """
+                                INSERT INTO attendance (student_id, attendance_date, status, marked_by)
+                                VALUES (%s, %s, %s, %s)
+                                """,
+                                (student["id"], attendance_date, status, session.get("user")),
+                            )
+                            attendance_id = cur.lastrowid
+
+                        if status == "Absent" and previous_status != "Absent":
+                            absent_notifications.append((student["id"], attendance_id))
+
+                conn.commit()
+            except Exception:
+                conn.rollback()
+                raise
+            finally:
+                conn.close()
+
+            for student_id, attendance_id in absent_notifications:
+                sent, notification_message = record_and_send_absence_notification(
+                    student_id=student_id,
+                    attendance_id=attendance_id,
+                    attendance_date=attendance_date,
+                    status="Absent",
+                )
+                flash(notification_message, "success" if sent else "warning")
+
+            flash(f"Attendance saved for {len(students)} students.", "success")
+            return redirect(
+                url_for(
+                    "bp_attendance_admin.mark_attendance",
+                    **{"class": selected_class, "attendance_date": attendance_date.isoformat()},
+                )
+            )
+
+    if selected_class in classes:
+        conn = get_connection()
+        try:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    SELECT s.id, s.roll_number, s.full_name, s.class, s.section,
+                           a.status AS attendance_status
+                    FROM students s
+                    LEFT JOIN attendance a
+                      ON a.student_id=s.id AND a.attendance_date=%s
+                    WHERE s.class=%s
+                    ORDER BY s.section, s.roll_number, s.full_name
+                    """,
+                    (attendance_date, selected_class),
+                )
+                students = cur.fetchall()
+        finally:
+            conn.close()
 
     return render_template(
         "admin/attendance/mark.html",
         students=students,
+        classes=classes,
+        selected_class=selected_class,
+        attendance_date=attendance_date,
         today=_today(),
         message=message,
     )
@@ -353,4 +407,3 @@ def monthly_attendance():
         late_cnt=late_cnt,
         attendance_percentage=attendance_percentage,
     )
-

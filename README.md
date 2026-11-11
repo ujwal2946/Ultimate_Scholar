@@ -28,6 +28,12 @@ Create a MySQL database named `student_db` (or change `MYSQL_DATABASE` in `.env`
 mysql -u root -p student_db < database/schema.sql
 ```
 
+For an existing database created with an older schema, also run this once to allow
+siblings to share a parent's email address and phone number:
+```bash
+mysql -u root -p student_db < database/parent_contacts_not_unique.sql
+```
+
 ### 3) Configure environment
 Copy `.env.example` to `.env` and update values.
 

@@ -1,0 +1,6 @@
+1.)terminal-1:
+python app.py
+
+new terminal:
+
+#cloudflared tunnel --url http://localhost:5000

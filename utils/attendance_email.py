@@ -67,13 +67,38 @@ def send_absence_notification_gmail(payload: dict):
     msg["Subject"] = subject
     msg.attach(MIMEText(body, "plain"))
 
-    try:
-        with smtplib.SMTP(smtp_host, smtp_port) as server:
+    def _send_starttls(port: int):
+        with smtplib.SMTP(smtp_host, port, timeout=20) as server:
             server.ehlo()
             server.starttls()
+            server.ehlo()
             server.login(smtp_user, smtp_password)
             server.sendmail(from_email, [parent_email], msg.as_string())
+
+    def _send_ssl(port: int):
+        with smtplib.SMTP_SSL(smtp_host, port, timeout=20) as server:
+            server.login(smtp_user, smtp_password)
+            server.sendmail(from_email, [parent_email], msg.as_string())
+
+    try:
+        if smtp_port == 465:
+            _send_ssl(smtp_port)
+        else:
+            _send_starttls(smtp_port)
         return True, None
+    except PermissionError as e:
+        # Some networks block STARTTLS/587 but permit Gmail's implicit TLS
+        # endpoint. Retry that endpoint before reporting a local socket block.
+        if smtp_host.lower() == "smtp.gmail.com" and smtp_port != 465:
+            try:
+                _send_ssl(465)
+                return True, None
+            except Exception as fallback_error:
+                return False, (
+                    "SMTP connections on ports 587 and 465 are blocked by this "
+                    f"Windows environment: {type(fallback_error).__name__}: {fallback_error}"
+                )
+        return False, f"SMTP connection blocked by this Windows environment: {e}"
     except Exception as e:
         # Include exception type for easier troubleshooting.
         return False, f"{type(e).__name__}: {e}"
@@ -83,11 +108,8 @@ def send_absence_notification_gmail(payload: dict):
 def record_and_send_absence_notification(*, student_id: int, attendance_id: int, attendance_date, status: str):
     """Persist notifications row and attempt sending.
 
-    Must be called after attendance row is saved.
-
-    Note:
-    - Some installs may not have notification de-dup columns/constraints.
-    - This function tries to avoid duplicate sends by checking for an existing row.
+    Must be called after attendance row is saved. Returns ``(sent, message)`` so
+    the attendance page can tell the signed-in user what happened.
     """
 
     # Retrieve parent email and student info
@@ -109,7 +131,7 @@ def record_and_send_absence_notification(*, student_id: int, attendance_id: int,
             """,
             (student_id, "", "Attendance Alert", "Student not found", "failed", "student record missing"),
         )
-        return
+        return False, "The student record was not found, so no email was sent."
 
     parent_email = student.get("parent_email") or ""
     full_name = student.get("full_name") or ""
@@ -142,7 +164,7 @@ def record_and_send_absence_notification(*, student_id: int, attendance_id: int,
             """,
             (student_id, "", subject, message, "failed", "parent_email missing"),
         )
-        return
+        return False, "The parent email address is missing, so no email was sent."
 
     ok, err = send_absence_notification_gmail(
         {
@@ -154,29 +176,38 @@ def record_and_send_absence_notification(*, student_id: int, attendance_id: int,
         }
     )
 
-    # Record result and include SMTP error (if any) in error_message.
-    # This uses only columns guaranteed by `database/schema.sql`.
-    execute(
-        """
-        INSERT INTO notifications (
-            student_id,
-            parent_email,
-            subject,
-            message,
-            notification_status,
-            sent_at,
-            error_message
-        )
-        VALUES (%s, %s, %s, %s, %s, NOW(), %s)
-        """,
-        (
-            student_id,
-            parent_email,
-            subject,
-            message,
-            "sent" if ok else "failed",
-            err,
-        ),
-    )
+    # A failed delivery must not look like it was sent. Keep the error in the
+    # audit row, but leave sent_at empty unless Gmail accepted the message.
+    try:
+        if ok:
+            execute(
+                """
+                INSERT INTO notifications (
+                    student_id, parent_email, subject, message,
+                    notification_status, sent_at, error_message
+                )
+                VALUES (%s, %s, %s, %s, %s, NOW(), %s)
+                """,
+                (student_id, parent_email, subject, message, "sent", None),
+            )
+        else:
+            execute(
+                """
+                INSERT INTO notifications (
+                    student_id, parent_email, subject, message,
+                    notification_status, sent_at, error_message
+                )
+                VALUES (%s, %s, %s, %s, %s, NULL, %s)
+                """,
+                (student_id, parent_email, subject, message, "failed", err),
+            )
+    except Exception as exc:
+        # Attendance has already been saved. Do not turn a notification-audit
+        # failure into a 500 error on the attendance page.
+        return False, f"Email could not be recorded: {type(exc).__name__}"
+
+    if ok:
+        return True, f"Absence notification sent to {parent_email}."
+    return False, f"Attendance was saved, but the absence email failed: {err}"
 
 
